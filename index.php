@@ -30,8 +30,5 @@ echo ('> Attachment filter <BR>');
 echo ('<input type=submit value="Save settings">');
 ?>
 </form>
-<!--><form action=getmail.php>
-<input type=submit value="Run script">-->
-</form>
 </body>
 </html>

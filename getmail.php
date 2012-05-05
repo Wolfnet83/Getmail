@@ -28,9 +28,9 @@ for ($i = 1; $i <= $total_count; $i++)
 		}
 }
 
-$files=scandir($DIR_PATH);
-foreach($files as $file) echo ($file.'<br>');
-echo("<a href=http://77.89.224.12/getmail>Back</a>");
+//$files=scandir($DIR_PATH);
+//foreach($files as $file) echo ($file.'<br>');
+//echo("<a href=http://77.89.224.12/getmail>Back</a>");
 
 imap_close ($mbox);
 
