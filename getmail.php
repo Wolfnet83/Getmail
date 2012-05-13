@@ -4,8 +4,7 @@ include 'env.conf';
 opendir($DIR_PATH) or system('mkdir '.$DIR_PATH.';');
 
 
-$mbox=imap_open('{'.$MAIL_SERVER.'/ssl/imap4/novalidate-cert}INBOX',$USERNAME,$PASS);
-//$folders=imap_listmailbox($mbox,'{'.$MAIL_SERVER.'/pop3/novalidate-cert}INBOX','*');
+$mbox=imap_open('{'.$MAIL_SERVER.'/novalidate-cert}',$USERNAME,$PASS);// or die(print_r (imap_errors()));
 
 //count the number of letters
 $total_count = imap_num_msg($mbox);
@@ -15,22 +14,15 @@ echo "\n".'Total_messages:'.$total_count."\n";
 for ($i = 1; $i <= $total_count; $i++)
 {
 		$msg_subject= imap_headerinfo($mbox,$i)->Subject;
-//		print_r (imap_headerinfo($mbox,$i));
-//		$date = imap_headerinfo($mbox,$i)->udate;
-		//		if (fnmatch("qwer??",$msg_subject)) echo $MAIL_SUBJ;
-		if (fnmatch($MAIL_SUBJ,$msg_subject)) saveAttachment($DIR_PATH,$mbox,$i,imap_headerinfo($mbox,$i)->udate); 
+		if (my_fnmatch($MAIL_SUBJ,$msg_subject)) saveAttachment($DIR_PATH,$mbox,$i,imap_headerinfo($mbox,$i)->udate); 
 
 		$struct=imap_fetchstructure($mbox,$i);
 		$filenames=getAttachment($struct);
-//		print_r ($filenames);
 		foreach($filenames as $attach){
-			if (fnmatch($MAIL_ATTACH,$attach)) saveAttachment($DIR_PATH,$mbox,$i,imap_headerinfo($mbox,$i)->udate); 
+			if (my_fnmatch($MAIL_ATTACH,$attach)) saveAttachment($DIR_PATH,$mbox,$i,imap_headerinfo($mbox,$i)->udate); 
 		}
 }
 
-//$files=scandir($DIR_PATH);
-//foreach($files as $file) echo ($file.'<br>');
-//echo("<a href=http://77.89.224.12/getmail>Back</a>");
 
 imap_close ($mbox);
 
@@ -97,10 +89,27 @@ function getAttachment($part){
 		}
 	}
 	else{
-		if (isset($part->disposition)&& $part->disposition == 'ATTACHMENT'){
+		if (isset($part->disposition)&& $part->disposition == 'attachment'){
 			$arr[]=$part->dparameters[0]->value;
 		}
 	}
 	return $arr;
+}
+
+function my_fnmatch($strPattern, $strString){
+$intPos = 0;
+do
+ {
+	$strPatternChar = substr($strPattern,$intPos,1);
+	$strStringChar  = substr($strString, $intPos, 1);
+	if ($strPatternChar == '*')
+	{
+	$bolMatch = TRUE;
+	break;
+	}
+	$bolMatch = ($strPatternChar == $strStringChar) || ($strPatternChar == '?' && $strStringChar !='');
+	$intPos++;
+} while (($bolMatch ==TRUE) && ($intPos < max(strlen($strPattern), strlen($strString))));
+return($bolMatch);
 }
 ?>

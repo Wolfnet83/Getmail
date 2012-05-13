@@ -1,14 +1,39 @@
 <?php
-$conf_file = fopen('env.conf','w');
-$file_content="<?php \n";
-$file_content.='$MAIL_SERVER=\''.$_POST['MAIL_SERVER']."';\n";
-$file_content.='$USERNAME=\''.$_POST['USERNAME']."';\n";
-$file_content.='$PASS="'.$_POST['PASS']."\";\n";
-$file_content.='$DIR_PATH=\''.$_POST['DIR_PATH']."';\n";
-$file_content.='$MAIL_SUBJ="'.$_POST['MAIL_SUBJ']."\";\n";
-$file_content.='$MAIL_ATTACH="'.$_POST['MAIL_ATTACH']."\";\n";
-$file_content.="?>";
-fwrite($conf_file,$file_content);
-fclose($conf_file);
-echo("<a href=http://77.89.224.12/getmail>Back</a>");
+$jobs = load_jobs();
+
+if ($_POST['action']=='add')
+{
+	foreach ($jobs as $id=>$value){
+	}
+	$new_id=$id+1;
+	$jobs[$new_id]['mailserver']=$_POST['mailserver'];
+	$jobs[$new_id]['username']=$_POST['username'];
+	$jobs[$new_id]['pass']=$_POST['pass'];
+	$jobs[$new_id]['mail_from']=$_POST['mail_from'];
+	$jobs[$new_id]['mail_subject']=$_POST['mail_subject'];
+	$jobs[$new_id]['mail_filename']=$_POST['mail_filename'];
+	$jobs[$new_id]['directory']=$_POST['directory'];
+	$jobs[$new_id]['is_replace']=$_POST['is_replace'];
+	$jobs[$new_id]['filename_ptr']=$_POST['filename_ptr'];
+	$jobs[$new_id]['cron']=$_POST['cron'];
+	save_jobs($jobs);
+}
+
+if ($_POST['action']=='delete'){
+	$id=(int) $_POST['id'];
+	unset($jobs[$id]);
+	save_jobs($jobs);
+}
+function save_jobs($arr){
+	$file = fopen('config.php','w');
+	fwrite($file,serialize($arr));
+	fclose ($file);
+}
+function load_jobs(){
+	$file=fopen('config.php',"r");
+	$string = fread($file,filesize("config.php"));
+	fclose($file);
+	return(unserialize($string));
+}
+echo("<meta http-equiv=\"refresh\" content=\"0;URL=index.php\">");
 ?>
